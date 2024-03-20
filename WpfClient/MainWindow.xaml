@@ -1,0 +1,40 @@
+﻿<Window x:Class="WpfClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfClient"
+        mc:Ignorable="d" FontSize="18"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Button x:Name="openConnection" Grid.Row="0" HorizontalAlignment="Left"
+                Padding="20 10" Margin="20" Click="openConnection_Click">
+            Open Connection
+        </Button>
+        <Button x:Name="closeConnection" Grid.Row="0" HorizontalAlignment="Right"
+        Padding="20 10" Margin="20" Click="closeConnection_Click">
+            Close Connection
+        </Button>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+            <TextBox x:Name="messageInput" MinWidth="300" Margin="20"></TextBox>
+            <Button x:Name="sendMessage"  IsEnabled="False"
+        Padding="20 10" Margin="20" Click="sendMessage_Click">
+                Send Message
+            </Button>
+        </StackPanel>
+        <ScrollViewer Grid.Row="2" Margin="20" MaxHeight="200"
+                      VerticalScrollBarVisibility="Auto">
+            <ListBox x:Name="messages" HorizontalAlignment="Stretch"
+                     Padding="20 10" BorderThickness="0"></ListBox>
+        </ScrollViewer>
+    </Grid>
+</Window>
