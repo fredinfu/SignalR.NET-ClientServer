@@ -1,4 +1,4 @@
-# SignalRBlazorServer
+# SignalR BlazorServer and WPF App Client
 
 Implementation of SignalR communication in a chat example in .NET Framework
 
