@@ -28,6 +28,7 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapHub<Chathub>("/chathub");
+app.MapHub<CounterHub>("/counterhub");
 app.MapFallbackToPage("/_Host");
 
 app.Run();

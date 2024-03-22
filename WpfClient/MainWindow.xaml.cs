@@ -8,12 +8,18 @@ namespace WpfClient;
 public partial class MainWindow : Window
 {
     HubConnection connection;
+    HubConnection counterConnection;
     public MainWindow()
     {
         InitializeComponent();
 
         connection = new HubConnectionBuilder()
             .WithUrl("https://localhost:7036/chathub")
+            .WithAutomaticReconnect()
+            .Build();
+
+        counterConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7036/counterhub")
             .WithAutomaticReconnect()
             .Build();
 
@@ -59,7 +65,7 @@ public partial class MainWindow : Window
     {
         if(connection is not null)
         {
-            await connection.SendAsync("SendMessage", "WPF Client", messageInput.Text);
+            await connection.SendAsync("SendMessage", connection.ConnectionId, messageInput.Text);
         }
     }
 
@@ -71,6 +77,17 @@ public partial class MainWindow : Window
             {
                 var newMessage = $"{user}: {message}";
                 messages.Items.Add(newMessage);
+            });
+
+        });
+
+        connection.On<string, string>("ForceLogout", async (user, message) =>
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                var newMessage = $"You have been disconnected {user}: {message}";
+                messages.Items.Add(newMessage);
+                disconnect();
             });
 
         });
@@ -91,8 +108,59 @@ public partial class MainWindow : Window
 
     private void closeConnection_Click(object sender, RoutedEventArgs e)
     {
+        disconnect();
+    }
+
+    private void disconnect()
+    {
         connection.StopAsync();
         openConnection.IsEnabled = true;
         closeConnection.IsEnabled = false;
+    }
+
+    private async void openCounter_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await counterConnection.StartAsync();
+            openCounter.IsEnabled = false;
+        } catch (Exception ex)
+        {
+
+        }
+
+    }
+
+    private async void incrementCounter_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await counterConnection.InvokeAsync("AddToTotal", "WPF Client", 1);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+    private async void loginConnection_Click(object sender, RoutedEventArgs e)
+    {
+        
+        try
+        {
+            await connection.StartAsync();
+            messages.Items.Add("Login started");
+            loginConnection.IsEnabled = false;
+            closeConnection.IsEnabled = true;
+            sendMessage.IsEnabled = true;
+        }
+        catch (Exception ex)
+        {
+            messages.Items.Add(ex.Message);
+        }
+
+
+
     }
 }

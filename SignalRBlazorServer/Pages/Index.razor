@@ -3,11 +3,11 @@
 @inject NavigationManager NavManager
 @implements IAsyncDisposable
 
-<div class="form-group">
+@* <div class="form-group">
     <label>
         User: <input @bind="userInput" />
     </label>
-</div>
+</div> *@
 
 <div class="form-group">
     <label>
@@ -19,21 +19,39 @@
 
 <hr />
 
+<div class="form-group">
+    <label>
+        ConnectionId: <input @bind="userConnectionId" />
+    </label>
+</div>
+
+
+
+<button @onclick="Disconnect" >Disconnect</button>
+
+<hr />
+<label>Server Connection Id: @hubConnectionId</label>
 <ul>
-    @foreach(string message in messages)
+
+    @foreach (var message in Messages)
     {
-        <li>@message</li>
+        <li>(ConnectionId @message.ConnectionId): @message.Text <button @onclick="() => Disconnect(message.ConnectionId)">Disconnect user</button></li>
     }
 </ul>
 
 @code {
+    public struct Message { public string ConnectionId { get; set; } public string Text { get; set; }}
+
     private HubConnection? hubConnection;
-    private List<string> messages = new List<string>();
-    private string? userInput;
+    private List<Message> Messages;
+
     private string? messageInput;
+    private string? userConnectionId;
+    private string? hubConnectionId;
 
     protected override async Task OnInitializedAsync()
     {
+        Messages = new List<Message>();
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavManager.ToAbsoluteUri("/chathub"))
             .WithAutomaticReconnect()
@@ -41,13 +59,19 @@
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
         {
-            var formattedMessage = $"{user}: {message}";
-            messages.Add(formattedMessage);
+
+            Messages.Add(new Message
+            {
+                ConnectionId = user,
+                Text = message
+            });
             InvokeAsync(StateHasChanged);
+
 
         });
 
         await hubConnection.StartAsync();
+        hubConnectionId = hubConnection.ConnectionId;
 
     }
 
@@ -55,7 +79,24 @@
     {
         if(hubConnection is not null)
         {
-            await hubConnection.SendAsync("SendMessage", userInput, messageInput);
+            await hubConnection.SendAsync("SendMessage", hubConnection.ConnectionId, messageInput);
+        }
+    }
+
+    private async Task Disconnect()
+    {
+        if(hubConnection is not null)
+        {
+            await hubConnection.SendAsync("DisconnectUser", userConnectionId, "Logout");
+        }
+    }
+
+    private async Task Disconnect(string connectionId)
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.SendAsync("DisconnectUser", connectionId, $"You have been disconnected by: {hubConnectionId}");
+            await hubConnection.SendAsync("SendMessage", hubConnection.ConnectionId, $"Server {hubConnectionId} has disconnect client: {connectionId}");
         }
     }
 
