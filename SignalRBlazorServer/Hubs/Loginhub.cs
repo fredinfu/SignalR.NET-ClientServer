@@ -3,18 +3,22 @@ namespace SignalRBlazorServer.Hubs;
 
 public class Loginhub : Hub
 {
-    public Task SendMessage(string user, string message)
+    public Task SendMessage(string connectionId, string message, string username)
     {
-        var connectionId = Context.ConnectionId;
+        //var connectionId = Context.ConnectionId;
         string userDetail = $" Client Connection Id: {connectionId}";
         //Clients.Client(connectionId).SendAsync("ForceLogout");
-        return Clients.All.SendAsync("ReceiveMessage", connectionId, message);
+        return Clients.All.SendAsync("ReceiveMessage", connectionId, message, username);
     }
 
     public Task LoginMessage(string connectionId, string username)
     {
         var loginMessage = $"User: {username} has joined";
-        return Clients.All.SendAsync("ReceiveMessage", connectionId, loginMessage);
+        /*
+         * var person = personAccountService.GetPerson(username)
+         */
+        //sessionComponentService.UpdateConnectionId(username, person.PersonAccountId)
+        return Clients.All.SendAsync("ReceiveMessage", connectionId, loginMessage, username);
     }
 
     public Task DisconnectUser(string connectionId, string message)

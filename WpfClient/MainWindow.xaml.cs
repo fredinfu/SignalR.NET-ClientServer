@@ -24,6 +24,7 @@ public partial class MainWindow : Window
             {
                 var newMessage = "Attempting to reconnect...";
                 messages.Items.Add(newMessage);
+                
             });
 
             return Task.CompletedTask;
@@ -36,6 +37,7 @@ public partial class MainWindow : Window
                 var newMessage = "Reconnected to the server";
                 messages.Items.Clear();
                 messages.Items.Add(newMessage);
+                connectionId.Text = connection.ConnectionId;
             });
 
             return Task.CompletedTask;
@@ -49,6 +51,7 @@ public partial class MainWindow : Window
                 messages.Items.Add(newMessage);
                 closeConnection.IsEnabled = false;
                 sendMessage.IsEnabled = false;
+                connectionId.Text = "";
             });
 
             return Task.CompletedTask;
@@ -59,18 +62,18 @@ public partial class MainWindow : Window
     {
         if(connection is not null)
         {
-            await connection.SendAsync("SendMessage", connection.ConnectionId, messageInput.Text);
+            await connection.SendAsync("SendMessage", connection.ConnectionId, messageInput.Text, usernameInput.Text);
         }
     }
 
     private async void loginConnection_Click(object sender, RoutedEventArgs e)
     {
         //Initiate handler to start listening new messages sents on "ReceiveMessage" MethodName Channel
-        connection.On<string, string>("ReceiveMessage", async (user, message) =>
+        connection.On<string, string, string>("ReceiveMessage", async (connectionId, message, user) =>
         {
             this.Dispatcher.Invoke(() =>
             {
-                var newMessage = $"{user}: {message}";
+                var newMessage = $"{user}: {message} (ConnectionId: {connectionId})";
                 messages.Items.Add(newMessage);
             });
 
@@ -105,6 +108,7 @@ public partial class MainWindow : Window
         {
             //Sends info to server, server should save in db ConnectionId of this session where Username matches in a SessionManagement Table
             await connection.SendAsync("LoginMessage", connection.ConnectionId, usernameInput.Text);
+            connectionId.Text = connection.ConnectionId;
             messageInput.ForceCursor = true;
         }
 
@@ -127,11 +131,17 @@ public partial class MainWindow : Window
         connection.StopAsync();
         loginConnection.IsEnabled = true;
         closeConnection.IsEnabled = false;
+        
     }
 
     private void usernameInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-    {
+  {
         loginConnection.IsEnabled = string.IsNullOrEmpty(usernameInput.Text) == false;
         
+    }
+
+    private void clearMessages_Click(object sender, RoutedEventArgs e)
+    {
+        messages.Items.Clear();
     }
 }

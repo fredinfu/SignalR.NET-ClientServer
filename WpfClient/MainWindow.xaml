@@ -35,9 +35,14 @@ Padding="20 10" Margin="20" Click="loginConnection_Click" IsEnabled="False" >
                 Send Message
             </Button>
         </StackPanel>
-        <Button x:Name="closeConnection" Grid.Row="2" HorizontalAlignment="Center"
+        <Button x:Name="closeConnection" Grid.Row="2" HorizontalAlignment="Left"
 Padding="20 10" Margin="20" Click="closeConnection_Click">
             Log out
+        </Button>
+        <TextBox x:Name="connectionId" Padding="0 10" Margin="20" Grid.Row="2" HorizontalAlignment="Center"></TextBox>
+        <Button x:Name="clearMessages" Grid.Row="2" HorizontalAlignment="Right"
+Padding="20 10" Margin="20" Click="clearMessages_Click" >
+            Clear messages
         </Button>
         <ScrollViewer Grid.Row="3" Margin="20" MaxHeight="200"
                       VerticalScrollBarVisibility="Auto">
