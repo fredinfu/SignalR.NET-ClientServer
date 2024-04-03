@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Components\Counter.razor" />
+    <Folder Include="Components\" />
   </ItemGroup>
 
 </Project>

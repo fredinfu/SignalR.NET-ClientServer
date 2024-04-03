@@ -27,8 +27,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.MapBlazorHub();
-app.MapHub<Chathub>("/chathub");
-app.MapHub<CounterHub>("/counterhub");
+app.MapHub<Loginhub>("/loginhub");
 app.MapFallbackToPage("/_Host");
 
 app.Run();

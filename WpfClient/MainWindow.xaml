@@ -15,18 +15,18 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Button x:Name="openConnection" Grid.Row="0" HorizontalAlignment="Left"
-                Padding="20 10" Margin="20" Click="openConnection_Click">
-            Open Connection
-        </Button>
-        <Button x:Name="loginConnection" Grid.Row="0" HorizontalAlignment="Center"
-        Padding="20 10" Margin="20" Click="loginConnection_Click" >
-            Login
-        </Button>
-        <Button x:Name="closeConnection" Grid.Row="0" HorizontalAlignment="Right"
-        Padding="20 10" Margin="20" Click="closeConnection_Click">
-            Close Connection
-        </Button>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center">
+            <Label x:Name="usernameLabel" Padding="0 10" Margin="20">Username:</Label>
+            <TextBox x:Name="usernameInput" MinWidth="100" Margin="20" TextChanged="usernameInput_TextChanged"></TextBox>
+            <Button x:Name="loginConnection" HorizontalAlignment="Center"
+Padding="20 10" Margin="20" Click="loginConnection_Click" IsEnabled="False" >
+                Login
+            </Button>
+        </StackPanel>
+
+
+        
+        
 
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
             <TextBox x:Name="messageInput" MinWidth="300" Margin="20"></TextBox>
@@ -35,19 +35,16 @@
                 Send Message
             </Button>
         </StackPanel>
-        <ScrollViewer Grid.Row="2" Margin="20" MaxHeight="200"
+        <Button x:Name="closeConnection" Grid.Row="2" HorizontalAlignment="Center"
+Padding="20 10" Margin="20" Click="closeConnection_Click">
+            Log out
+        </Button>
+        <ScrollViewer Grid.Row="3" Margin="20" MaxHeight="200"
                       VerticalScrollBarVisibility="Auto">
             <ListBox x:Name="messages" HorizontalAlignment="Stretch"
                      Padding="20 10" BorderThickness="0"></ListBox>
         </ScrollViewer>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center">
-            <Button x:Name="openCounter" Padding="20 10" Margin="20" Click="openCounter_Click">
-                Open Counter Connection
-            </Button>
-            <Button x:Name="incrementCounter" Padding="20 10" Margin="20" Click="incrementCounter_Click">
-                Increment Counter
-            </Button>
-        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

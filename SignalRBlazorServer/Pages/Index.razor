@@ -40,10 +40,10 @@
 </ul>
 
 @code {
-    public struct Message { public string ConnectionId { get; set; } public string Text { get; set; }}
+    public struct LoginMessage { public string ConnectionId { get; set; } public string Text { get; set; }}
 
     private HubConnection? hubConnection;
-    private List<Message> Messages;
+    private List<LoginMessage> Messages;
 
     private string? messageInput;
     private string? userConnectionId;
@@ -51,16 +51,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Messages = new List<Message>();
+        Messages = new List<LoginMessage>();
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(NavManager.ToAbsoluteUri("/chathub"))
+            .WithUrl(NavManager.ToAbsoluteUri("/loginhub"))
             .WithAutomaticReconnect()
             .Build();
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
         {
 
-            Messages.Add(new Message
+            Messages.Add(new LoginMessage
             {
                 ConnectionId = user,
                 Text = message

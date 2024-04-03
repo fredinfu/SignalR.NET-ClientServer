@@ -12,14 +12,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
+        usernameInput.ForceCursor = true;
         connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7036/chathub")
-            .WithAutomaticReconnect()
-            .Build();
-
-        counterConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7036/counterhub")
+            .WithUrl("https://localhost:7036/loginhub")
             .WithAutomaticReconnect()
             .Build();
 
@@ -52,7 +47,6 @@ public partial class MainWindow : Window
             {
                 var newMessage = "Connection closed";
                 messages.Items.Add(newMessage);
-                openConnection.IsEnabled = true;
                 closeConnection.IsEnabled = false;
                 sendMessage.IsEnabled = false;
             });
@@ -69,8 +63,9 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void openConnection_Click(object sender, RoutedEventArgs e)
+    private async void loginConnection_Click(object sender, RoutedEventArgs e)
     {
+        //Initiate handler to start listening new messages sents on "ReceiveMessage" MethodName Channel
         connection.On<string, string>("ReceiveMessage", async (user, message) =>
         {
             this.Dispatcher.Invoke(() =>
@@ -81,6 +76,7 @@ public partial class MainWindow : Window
 
         });
 
+        //Initiante event handler listening when server condition indicates this user to disconnect
         connection.On<string, string>("ForceLogout", async (user, message) =>
         {
             this.Dispatcher.Invoke(() =>
@@ -95,61 +91,6 @@ public partial class MainWindow : Window
         try
         {
             await connection.StartAsync();
-            messages.Items.Add("Connection started");
-            openConnection.IsEnabled = false;
-            closeConnection.IsEnabled = true;
-            sendMessage.IsEnabled = true;
-        }
-        catch (Exception ex)
-        {
-            messages.Items.Add(ex.Message);
-        }
-    }
-
-    private void closeConnection_Click(object sender, RoutedEventArgs e)
-    {
-        disconnect();
-    }
-
-    private void disconnect()
-    {
-        connection.StopAsync();
-        openConnection.IsEnabled = true;
-        closeConnection.IsEnabled = false;
-    }
-
-    private async void openCounter_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            await counterConnection.StartAsync();
-            openCounter.IsEnabled = false;
-        } catch (Exception ex)
-        {
-
-        }
-
-    }
-
-    private async void incrementCounter_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            await counterConnection.InvokeAsync("AddToTotal", "WPF Client", 1);
-        }
-        catch (Exception ex)
-        {
-
-            throw;
-        }
-    }
-
-    private async void loginConnection_Click(object sender, RoutedEventArgs e)
-    {
-        
-        try
-        {
-            await connection.StartAsync();
             messages.Items.Add("Login started");
             loginConnection.IsEnabled = false;
             closeConnection.IsEnabled = true;
@@ -160,7 +101,37 @@ public partial class MainWindow : Window
             messages.Items.Add(ex.Message);
         }
 
+        if (connection is not null)
+        {
+            //Sends info to server, server should save in db ConnectionId of this session where Username matches in a SessionManagement Table
+            await connection.SendAsync("LoginMessage", connection.ConnectionId, usernameInput.Text);
+            messageInput.ForceCursor = true;
+        }
 
 
+    }
+
+
+
+    private async void closeConnection_Click(object sender, RoutedEventArgs e)
+    {
+        if (connection is not null)
+        {
+            await connection.SendAsync("SendMessage", connection.ConnectionId, $"Connection :{connection.ConnectionId} has log out");
+        }
+        disconnect();
+    }
+
+    private void disconnect()
+    {
+        connection.StopAsync();
+        loginConnection.IsEnabled = true;
+        closeConnection.IsEnabled = false;
+    }
+
+    private void usernameInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        loginConnection.IsEnabled = string.IsNullOrEmpty(usernameInput.Text) == false;
+        
     }
 }
