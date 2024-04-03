@@ -14,7 +14,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         usernameInput.ForceCursor = true;
         connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7036/loginhub")
+            //.WithUrl("https://localhost:5012/loginhub") //GenesysOneApi
+            .WithUrl("https://localhost:7036/loginhub") //BlazorSignalServer
             .WithAutomaticReconnect()
             .Build();
 
